@@ -34,6 +34,8 @@ function onMessageHandler (target, context, msg, self) {
   // Remove whitespace from chat message
   const commandName = msg.trim();
 
+  // @TODO keep track of all messages
+
   // If the command is known, let's execute it
   if (commandName === '!dice') {
     const num = rollDice();
