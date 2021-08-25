@@ -1,4 +1,6 @@
 const dotenv = require('dotenv');
+const fs = require('fs')
+
 dotenv.config();
 
 console.log('BOT_USERNAME: ' + process.env.BOT_USERNAME);
@@ -28,21 +30,34 @@ client.on('connected', onConnectedHandler);
 client.connect();
 
 // Called every time a message comes in
-function onMessageHandler (target, context, msg, self) {
+function onMessageHandler (channel, tags, msg, self) {
   if (self) { return; } // Ignore messages from the bot
+  
+  console.log("Message: " + msg + "\n");
 
-  // Remove whitespace from chat message
-  const commandName = msg.trim();
+  var stream = fs.createWriteStream("full_log.txt", {flags:'a'});
+  stream.write(new Date().toISOString() + ";");
+  stream.write(`@${tags.username}` + ';' +  msg + "\n")
+  stream.end();
 
   // @TODO keep track of all messages
 
-  // If the command is known, let's execute it
-  if (commandName === '!dice') {
-    const num = rollDice();
-    client.say(target, `You rolled a ${num}`);
-    console.log(`* Executed ${commandName} command`);
-  } else {
-    console.log(`* Unknown command ${commandName}`);
+  if (msg.startsWith('!')) {
+    const args = msg.slice(1).split(' ');
+    const command = args.shift().toLowerCase();
+
+    var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
+    stream.write(msg.toLowerCase() + "\n")
+    stream.end();
+
+    // If the command is known, let's execute it
+    if (command === 'forward') {
+    } else if (command === 'back') {
+    } else if (command === 'spin') {
+
+    } else {
+      console.log(`* Unknown command ${command}`);
+    }
   }
 }
 

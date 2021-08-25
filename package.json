@@ -5,7 +5,7 @@
   "main": "garc.js",
   "dependencies": {
     "dotenv": "^10.0.0",
-    "tmi.js": "^1.8.3"
+    "tmi.js": "^1.8.5"
   },
   "devDependencies": {},
   "scripts": {
