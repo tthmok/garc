@@ -1,0 +1,47 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#auther: mizumasa
+
+import os
+import time
+import uuid
+
+DEBUG = False
+#
+#In bleak, it seems that the UUID of the characteristic must be written in lowercase.
+#
+SERVICE_UUID = uuid.UUID('10B20100-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+
+ID_UUID = uuid.UUID('10B20101-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+MOTOR_UUID = uuid.UUID('10B20102-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+LIGHT_UUID = uuid.UUID('10B20103-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+SOUND_UUID = uuid.UUID('10B20104-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+SENSOR_UUID = uuid.UUID('10B20106-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+BUTTON_UUID = uuid.UUID('10B20107-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+BATTERY_UUID = uuid.UUID('10B20108-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+CONFIG_UUID = uuid.UUID('10B201FF-5B3B-4571-9508-CF3EFCD7BBAE'.lower())
+
+MSG_ID_ID = 1
+MSG_ID_MOTOR = 2
+MSG_ID_LIGHT = 3
+MSG_ID_SOUND = 4
+MSG_ID_SENSOR = 6
+MSG_ID_BUTTON = 7
+MSG_ID_BATTERY = 8
+MSG_ID_CONFIG = 255
+MSG_ID_NOTIFY = 0
+MSG_ID_TOIONUM = 254
+MSG_ID_DISCONNECT = 253
+
+MOTOR_CONTROL_BASIC = 1
+MOTOR_CONTROL_TIMED = 2
+MOTOR_FORWARD = 1
+MOTOR_BACK = 2
+MOTOR_LEFT = 1
+MOTOR_RIGHT =2
+
+def main():
+    return
+
+if __name__ == '__main__':
+    main()
