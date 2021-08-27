@@ -7,7 +7,7 @@ import toio_message
 
 from bleak import BleakClient
 
-CUBE_ID_PURPLE = "F7:7C:30:71:FC:BA"
+CUBE_ID_BLUE = "F7:7C:30:71:FC:BA"
 CUBE_ID_YELLOW = "E1:F2:90:2E:8A:91"
 
 # tail a file forever
@@ -72,7 +72,7 @@ async def move(address, dir, speed, time, loop):
 if __name__ == "__main__":
     address = (
         # discovery.Set the device address of the toio Core Cube found by py here
-        CUBE_ID_PURPLE  #For Windows or Linux, specify a hexadecimal 6-byte device address.
+        CUBE_ID_BLUE  #For Windows or Linux, specify a hexadecimal 6-byte device address.
     )
     
     f = open('command_log.txt')
