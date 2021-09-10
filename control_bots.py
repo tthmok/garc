@@ -50,8 +50,8 @@ async def spin(address, loop):
         #Ends after 3 seconds
         await asyncio.sleep(3.0)
 
-#https://toio.github.io/toio-spec/docs/ble_motor#%E6%9B%B8%E3%81%8D%E8%BE%BC%E3%81%BF%E6%93%8D%E4%BD%9C
-# Data position	type	Contents	example
+# https://toio.github.io/toio-spec/en/docs/ble_communication_overview
+# # Data position	type	Contents	example
 # 0	UInt8	Type of control	0x01(Motor control)
 # 1	UInt8	ID of the controlling motor	0x01(left)
 # 2	UInt8	Motor rotation direction	0x01(forward)
