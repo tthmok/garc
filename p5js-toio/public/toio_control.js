@@ -51,16 +51,20 @@ socket.on('bot_command', function (msg) {
           console.log('command:' + command);
           if (command != null) {
             if (command === 'go') {
-              // left	number	-	Left motor speed. Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
-              // right	number	-	Right motor speed. Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
               // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
               cube.move(20, 20, 1200);
-
             } else if (command === 'back') {
               cube.move(-20, -20, 2550);
-
             } else if (command === 'spin') {
-              cube.move(-115, 115, 2550);
+              var speed = args.shift();
+              if (speed) {
+                speed = parseInt(speed);
+                speed = motorSpeedLimits(speed);
+              } else {
+                speed = 8;
+              }
+              
+              cube.move(-speed, speed, 1600);
             } else {
               console.log(`* Unknown command ${command}`);
             }
@@ -72,6 +76,18 @@ socket.on('bot_command', function (msg) {
     }
   }
 });
+
+function motorSpeedLimits(speed) {
+  // Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
+  speed = Math.max(-115, speed);
+  speed = Math.min(115, speed);
+  if (speed > -8 && speed < 0) {
+    speed = -8;
+  } else if (speed < 8 && speed > 0) {
+    speed = 8;
+  }
+  return speed;
+}
 
 function mouseClicked() {
   P5tCube.connectNewP5tCube().then(cube => {
