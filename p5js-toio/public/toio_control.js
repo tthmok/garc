@@ -1,3 +1,5 @@
+// This is the client-side javascript that gives commands to the actual toio hardware
+// Uses P5Toio
 const CUBE_ID_YELLOW = "8uIoeZIEkXIuB34389LITg==";
 const CUBE_NAME_YELLOW = "yellow";
 
