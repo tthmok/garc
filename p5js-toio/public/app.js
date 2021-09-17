@@ -82,29 +82,11 @@ function onMessageHandler (channel, tags, msg, self) {
   // @TODO keep track of all messages
 
   if (msg.startsWith('!')) {
-    const args = msg.slice(1).split(' ');
-    const command = args.shift().toLowerCase();
+    io.emit('bot_command', msg);
 
-    var commandRecognized = true;
-
-    // If the command is known, let's execute it
-    if (command === 'go') {
-
-        } else if (command === 'back') {
-    } else if (command === 'spin') {
-
-    } else {
-      commandRecognized = false;
-      console.log(`* Unknown command ${command}`);
-    }
-
-    if (commandRecognized) {
-      io.emit('bot_command', command);
-
-      var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
-      stream.write(msg.toLowerCase() + "\n")
-      stream.end();
-    }
+    var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
+    stream.write(msg.toLowerCase() + "\n")
+    stream.end();
   }
 }
 
