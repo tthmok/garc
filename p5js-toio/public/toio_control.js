@@ -56,14 +56,7 @@ socket.on('bot_command', function (msg) {
             } else if (command === 'back') {
               cube.move(-20, -20, 2550);
             } else if (command === 'spin') {
-              var speed = args.shift();
-              if (speed) {
-                speed = parseInt(speed);
-                speed = motorSpeedLimits(speed);
-              } else {
-                speed = 8;
-              }
-              
+              var speed = parseSpeed(args.shift(), 8);              
               cube.move(-speed, speed, 1600);
             } else {
               console.log(`* Unknown command ${command}`);
@@ -76,6 +69,15 @@ socket.on('bot_command', function (msg) {
     }
   }
 });
+
+function parseSpeed(speedStr, defaultSpeed=20) {
+  if (speedStr != null) {
+    var speed = parseInt(speedStr);
+    speed = motorSpeedLimits(speed);
+    return speed;
+  }
+  return defaultSpeed;
+}
 
 function motorSpeedLimits(speed) {
   // Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
