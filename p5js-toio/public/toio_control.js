@@ -22,9 +22,17 @@ function draw() {
 
 // client-side
 socket.on("connect", () => {
-  console.log(socket.id); // x8WIv7-mJelg7on_ALbx
+  console.log(socket.id);
 });
 
+socket.on('bot_command', function(msg) {
+//   left	number	-	Left motor speed. Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
+// right	number	-	Right motor speed. Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
+// duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
+  for( const cube of connectedCubeArray ){
+    cube?.move(20,10, 2550);
+  }
+});
 
 // app.get("/url", (req, res, next) => {
 //   res.json(["Tony","Lisa","Michael","Ginger","Food"]);

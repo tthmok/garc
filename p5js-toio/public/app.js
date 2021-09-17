@@ -98,7 +98,9 @@ function onMessageHandler (channel, tags, msg, self) {
       console.log(`* Unknown command ${command}`);
     }
 
-    if (commandRecognized) {      
+    if (commandRecognized) {
+      io.emit('bot_command', command);
+
       var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
       stream.write(msg.toLowerCase() + "\n")
       stream.end();
