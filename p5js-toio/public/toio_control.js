@@ -5,7 +5,7 @@
 //const CUBE_ID_YELLOW = "8uIoeZIEkXIuB34389LITg==";
 const CUBE_NAME_YELLOW = "yellow";
 
-//const CUBE_ID_BLUE = "o37KDYYr7WApagvW3TPn9A==";
+const CUBE_ID_BLUE = "toio Core Cube-h1A";
 const CUBE_NAME_BLUE = "blue";
 
 const connectedCubeArray = [];
@@ -28,8 +28,10 @@ socket.on("connect", () => {
 });
 
 socket.on('bot_command', function (msg) {
-  var botRecognized = false;
+  asyncHandleCubeCommand(msg);
+});
 
+async function asyncHandleCubeCommand(msg) {
   if (msg != null) {
     const args = msg.slice(1).split(' ');
 
@@ -45,19 +47,32 @@ socket.on('bot_command', function (msg) {
         // var cube = knownCubesById[cubeNameToId[botName]];
 
         if (cube != null) {
-          botRecognized = true;
-
           const command = args.shift().toLowerCase();
           console.log('command:' + command);
           if (command != null) {
-            if (command === 'go') {
+            if (command === 'go' || command === 'back') {
+              var speed = parseSpeed(args.shift(), 20);
+              if (command === 'back') {
+                speed = -speed;
+              }
               // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
-              cube.move(20, 20, 1200);
-            } else if (command === 'back') {
-              cube.move(-20, -20, 2550);
+              cube.move(speed, speed, 1350);
+            } else if (command === 'rotate') {
+              cube.rotate(parseSpeed(args.shift(), 20), 1350);
+            } else if (command === 'turnto') {
+              // turnTo(angle: number, speed: number, rotateType: string, timeout: number)
+              var angle = parseInt(args.shift());
+              console.log("turnto:" + angle)
+              if (angle != null) {
+                cube.x = 0;
+                cube.y = 0;
+                cube.sensorX = 0;
+                cube.sensorY = 0;
+                cube.turnTo(angle * (Math.PI / 180), 15);
+              }
             } else if (command === 'spin') {
-              var speed = parseSpeed(args.shift(), 8);              
-              cube.move(-speed, speed, 1600);
+              var speed = parseSpeed(args.shift(), 8);
+              cube.move(-speed, speed, 1350);
             } else {
               console.log(`* Unknown command ${command}`);
             }
@@ -68,9 +83,9 @@ socket.on('bot_command', function (msg) {
       }
     }
   }
-});
+}
 
-function parseSpeed(speedStr, defaultSpeed=20) {
+function parseSpeed(speedStr, defaultSpeed = 20) {
   if (speedStr != null) {
     var speed = parseInt(speedStr);
     speed = motorSpeedLimits(speed);
@@ -98,11 +113,17 @@ function mouseClicked() {
     //knownCubesById[cube.cube.device.id] = cube;
     connectedCubeArray.push(cube);
 
+    // const type = 'sensorcollision';
+    // cube.addEventListener(type, ()=>{
+    //   console.log(type);
+    //   cube.stop();
+    // });
+
     // Save some battery
     cube.turnLightOff();
 
     console.log("cube:" + cube.cube.device.id)
-    
+
     console.log("bat:" + cube.batteryLevel);
   });
 }
