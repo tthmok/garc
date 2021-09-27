@@ -1,11 +1,10 @@
 // This is the client-side javascript that gives commands to the actual toio hardware
 // Uses P5Toio
 
-// these IDs change between connections!!!!!!
-//const CUBE_ID_YELLOW = "8uIoeZIEkXIuB34389LITg==";
 const CUBE_NAME_YELLOW = "yellow";
+const CUBE_ID_YELLOW = "toio Core Cube-31j";
 
-const CUBE_ID_BLUE = "toio Core Cube-h1A";
+const CUBE_ID_BLUE = "toio Core Cube-D1h";
 const CUBE_NAME_BLUE = "blue";
 
 const connectedCubeArray = [];
