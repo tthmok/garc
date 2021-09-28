@@ -32,7 +32,7 @@ io.on('connection', (socket) => {
     }
     else {
       //client.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} will follow your command`);
-      client.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} is in use. Please wait.`);  
+      twitchClient.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} is in use. Please wait.`);  
     }
   });
 });
@@ -71,14 +71,14 @@ const opts = {
 };
 
 // Create a client with our options
-const client = new tmi.client(opts);
+const twitchClient = new tmi.client(opts);
 
 // Register our event handlers (defined below)
-client.on('message', onMessageHandler);
-client.on('connected', onConnectedHandler);
+twitchClient.on('message', onMessageHandler);
+twitchClient.on('connected', onConnectedHandler);
 
 // Connect to Twitch:
-client.connect();
+twitchClient.connect();
 
 // Called every time a message comes in
 function onMessageHandler (channel, tags, msg, self) {
