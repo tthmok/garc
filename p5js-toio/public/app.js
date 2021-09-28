@@ -24,12 +24,15 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg);
   });
   socket.on('command-response', msg => {
+    console.log('command-response:' + msg);
     // Give feedback to users according to the robot state
     if(msg['bot_responded']) {
-      client.whisper(msg['user_name'], `Bot ${msg['bot_name']} will follow your command`);  
+      //client.whisper(msg['user_name'], `Bot ${msg['bot_name']} will follow your command`);
+      //client.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} will follow your command`);
     }
     else {
-      client.whisper(msg['user_name'], `Bot ${msg['bot_name']} is in use. Please wait.`);  
+      //client.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} will follow your command`);
+      client.say("gogokodo", msg['user_name'] + ` Bot ${msg['bot_name']} is in use. Please wait.`);  
     }
   });
 });
@@ -81,7 +84,7 @@ client.connect();
 function onMessageHandler (channel, tags, msg, self) {
   if (self) { return; } // Ignore messages from the bot
   
-  console.log("Message: " + msg + "\n");
+  console.log("Twitch Message Received: " + msg + "\n");
 
   var stream = fs.createWriteStream("full_log.txt", {flags:'a'});
   stream.write(new Date().toISOString() + ";");
@@ -92,7 +95,7 @@ function onMessageHandler (channel, tags, msg, self) {
 
   if (msg.startsWith('!')) {
     // Add user name to the message
-    let msgWithName = msg.concat(`,${tags.username}`);
+    let msgWithName = msg.concat(` ${tags.username}`);
     io.emit('bot_command', msgWithName);
 
     var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
