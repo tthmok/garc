@@ -13,6 +13,9 @@ const cubeNameToId = {};
 cubeNameToId[CUBE_NAME_BLUE] = 0;
 cubeNameToId[CUBE_NAME_YELLOW] = 1;
 
+// {prevActionDone: number}
+let cubeStates = [];
+
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -30,11 +33,26 @@ socket.on('bot_command', function (msg) {
   asyncHandleCubeCommand(msg);
 });
 
+function tryExecCommand(timestamp, cubeState, username, commandFn, duration) {
+  if (timestamp > cubeState.prevActionDone) {
+    //cubeState.prevActionDone = timestamp + duration;
+    commandFn();
+    socket.emit('command-response', {'bot_name': cubeName, 'bot_responded': true, 'user_name': username});
+    return timestamp + duration;
+  } else {
+    socket.emit('command-response', {'bot_name': cubeName, 'bot_responded': false, 'user_name': username});
+    return cubeState.prevActionDone;
+  }
+}
+
 async function asyncHandleCubeCommand(msg) {
   if (msg != null) {
     const args = msg.slice(1).split(' ');
 
     console.log('args:' + args);
+
+    // Only execute commands when 
+    const ts = Date.now();
     if (args != null) {
       const cubeName = args.shift().toLowerCase();
       console.log('cubeName:' + cubeName);
@@ -44,20 +62,27 @@ async function asyncHandleCubeCommand(msg) {
         // so just deal with it for now I guess
         var cube = connectedCubeArray[cubeNameToId[cubeName]];
         // var cube = knownCubesById[cubeNameToId[botName]];
+        let cubeState = cubeStates[cubeNameToId[cubeName]];
 
         if (cube != null) {
           const command = args.shift().toLowerCase();
           console.log('command:' + command);
           if (command != null) {
             if (command === 'go' || command === 'back') {
-              var speed = parseSpeed(args.shift(), 20);
-              if (command === 'back') {
-                speed = -speed;
-              }
+                var speed = parseSpeed(args.shift(), 20);
+                if (command === 'back') {
+                  speed = -speed;
+                }
               // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
-              cube.move(speed, speed, 1350);
+                cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, 1350), 1350);
+              }
+              
             } else if (command === 'rotate') {
-              cube.rotate(parseSpeed(args.shift(), 20), 1350);
+              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.rotate(parseSpeed(args.shift(), 20), 1350), 1350);
+              //if (ts > cubeState.prevActionDone) {
+                //cubeState.prevActionDone = ts + 1350;
+                //cube.rotate(parseSpeed(args.shift(), 20), 1350);
+              //}
             } else if (command === 'turnto') {
               // turnTo(angle: number, speed: number, rotateType: string, timeout: number)
               var angle = parseInt(args.shift());
@@ -71,7 +96,7 @@ async function asyncHandleCubeCommand(msg) {
               }
             } else if (command === 'spin') {
               var speed = parseSpeed(args.shift(), 8);
-              cube.move(-speed, speed, 1350);
+              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(-speed, speed, 1350), 1350);
             } else {
               console.log(`* Unknown command ${command}`);
             }
@@ -111,6 +136,7 @@ function mouseClicked() {
 
     //knownCubesById[cube.cube.device.id] = cube;
     connectedCubeArray.push(cube);
+    cubeStates.push({prevActionDone: -1});
 
     // const type = 'sensorcollision';
     // cube.addEventListener(type, ()=>{

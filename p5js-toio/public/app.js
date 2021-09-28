@@ -23,6 +23,15 @@ io.on('connection', (socket) => {
   socket.on('chat message', (msg) => {
     console.log('message: ' + msg);
   });
+  socket.on('command-response', msg => {
+    // Give feedback to users according to the robot state
+    if(msg['bot_responded']) {
+      client.whisper(msg['user_name'], `Bot ${msg['bot_name']} will follow your command`);  
+    }
+    else {
+      client.whisper(msg['user_name'], `Bot ${msg['bot_name']} is in use. Please wait.`);  
+    }
+  });
 });
 
 app.get('/', (req, res) => {
@@ -82,7 +91,9 @@ function onMessageHandler (channel, tags, msg, self) {
   // @TODO keep track of all messages
 
   if (msg.startsWith('!')) {
-    io.emit('bot_command', msg);
+    // Add user name to the message
+    let msgWithName = msg.concat(`,${tags.username}`);
+    io.emit('bot_command', msgWithName);
 
     var stream = fs.createWriteStream("command_log.txt", {flags:'a'});
     stream.write(msg.toLowerCase() + "\n")
