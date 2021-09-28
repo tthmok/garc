@@ -15,8 +15,9 @@ cubeNameToId[CUBE_NAME_YELLOW] = 1;
 
 const MOTOR_MIN_SPEED = 8;
 const MOTOR_MAX_SPEED = 115;
-const TURN_90DEG_DURATION = 99; //just comes from guess and check. use together with min motor speed
-const TURN_DURATION_PER_DEGREE = TURN_90DEG_DURATION / 90; // This seems to break down past 180 degrees
+const MOTOR_TURN_SPEED = 13;
+const TURN_90DEG_DURATION = 58; //just comes from guess and check. use together with motor speed 12
+const TURN_DURATION_PER_DEGREE = TURN_90DEG_DURATION / 90; 
 
 // {prevActionDone: number}
 let cubeStates = [];
@@ -91,7 +92,7 @@ async function asyncHandleCubeCommand(msg) {
               // !{bot} rotate {degrees}
               var degrees = args.shift();
               var duration = turnDurationForDegrees(degrees);
-              var turnSpeed = MOTOR_MIN_SPEED;
+              var turnSpeed = MOTOR_TURN_SPEED;
               if (degrees < 0) {
                 turnSpeed = -turnSpeed;
               }
