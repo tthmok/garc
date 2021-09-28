@@ -24,7 +24,6 @@ io.on('connection', (socket) => {
     console.log('message: ' + msg);
   });
   socket.on('command-response', msg => {
-    console.log('command-response:' + msg);
     // Give feedback to users according to the robot state
     if(msg['bot_responded']) {
       //client.whisper(msg['user_name'], `Bot ${msg['bot_name']} will follow your command`);

@@ -13,9 +13,13 @@ const cubeNameToId = {};
 cubeNameToId[CUBE_NAME_BLUE] = 0;
 cubeNameToId[CUBE_NAME_YELLOW] = 1;
 
+const MOTOR_MIN_SPEED = 8;
+const MOTOR_MAX_SPEED = 115;
+const TURN_90DEG_DURATION = 98; //just comes from guess and check. use together with min motor speed
+const TURN_DURATION_PER_DEGREE = TURN_90DEG_DURATION / 90; // This seems to break down past 180 degrees
+
 // {prevActionDone: number}
 let cubeStates = [];
-
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
@@ -49,7 +53,8 @@ function tryExecCommand(timestamp, cubeState, username, commandFn, duration) {
   }
 }
 
-const DEFAULT_TIME = 2550;
+const DEFAULT_TIME = 1350;
+const MAX_TIME = 2550;
 
 async function asyncHandleCubeCommand(msg) {
   if (msg != null) {
@@ -83,22 +88,14 @@ async function asyncHandleCubeCommand(msg) {
               // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
                 cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, DEFAULT_TIME), DEFAULT_TIME);             
             } else if (command === 'rotate') {
-              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.rotate(parseSpeed(args.shift(), 20), DEFAULT_TIME), DEFAULT_TIME);
-              //if (ts > cubeState.prevActionDone) {
-                //cubeState.prevActionDone = ts + 1350;
-                //cube.rotate(parseSpeed(args.shift(), 20), 1350);
-              //}
-            } else if (command === 'turnto') {
-              // turnTo(angle: number, speed: number, rotateType: string, timeout: number)
-              var angle = parseInt(args.shift());
-              console.log("turnto:" + angle)
-              if (angle != null) {
-                cube.x = 0;
-                cube.y = 0;
-                cube.sensorX = 0;
-                cube.sensorY = 0;
-                cube.turnTo(angle * (Math.PI / 180), 15);
+              // !{bot} rotate {degrees}
+              var degrees = args.shift();
+              var duration = turnDurationForDegrees(degrees);
+              var turnSpeed = MOTOR_MIN_SPEED;
+              if (degrees < 0) {
+                turnSpeed = -turnSpeed;
               }
+              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(turnSpeed, -turnSpeed, duration), duration);
             } else if (command === 'spin') {
               console.log("spinning");
               var speed = parseSpeed(args.shift(), 8);
@@ -115,6 +112,10 @@ async function asyncHandleCubeCommand(msg) {
   }
 }
 
+function turnDurationForDegrees(degrees) {
+  return duration = TURN_DURATION_PER_DEGREE * degrees;
+}
+
 function parseSpeed(speedStr, defaultSpeed = 20) {
   if (speedStr != null) {
     var speed = parseInt(speedStr);
@@ -126,12 +127,12 @@ function parseSpeed(speedStr, defaultSpeed = 20) {
 
 function motorSpeedLimits(speed) {
   // Negative value means back direction. -115 to -8, 8 to 115, and 0 integer value.
-  speed = Math.max(-115, speed);
-  speed = Math.min(115, speed);
-  if (speed > -8 && speed < 0) {
-    speed = -8;
-  } else if (speed < 8 && speed > 0) {
-    speed = 8;
+  speed = Math.max(-MOTOR_MAX_SPEED, speed);
+  speed = Math.min(MOTOR_MAX_SPEED, speed);
+  if (speed > -MOTOR_MIN_SPEED && speed < 0) {
+    speed = -MOTOR_MIN_SPEED;
+  } else if (speed < MOTOR_MIN_SPEED && speed > 0) {
+    speed = MOTOR_MIN_SPEED;
   }
   return speed;
 }
@@ -155,7 +156,6 @@ function mouseClicked() {
 
     console.log("cube:" + cube.cube.device.id);
     console.log("name:" + cube.cube.device.name);
-
     console.log("bat:" + cube.batteryLevel);
   });
 }
