@@ -46,6 +46,9 @@ socket.on('bot_command', function (msg) {
 function tryExecCommand(timestamp, cubeState, username, commandFn, duration) {
   console.log(cubeState);
   console.log(username);
+  if (duration = 0) {
+    duration = 1; // hack!!! just trying to preven eternal commands from running accidentally
+  }
   if (duration > MAX_TIME) {
     duration = MAX_TIME;
   }
