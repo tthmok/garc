@@ -1,17 +1,22 @@
 // This is the client-side javascript that gives commands to the actual toio hardware
 // Uses P5Toio
 
-const CUBE_NAME_YELLOW = "yellow";
-const CUBE_ID_YELLOW = "toio Core Cube-31j";
 
-const CUBE_ID_BLUE = "toio Core Cube-D1h";
+const CUBE_NAME_RED = "red";
+const CUBE_ID_RED = "toio Core Cube-D1haa";
+
+const CUBE_NAME_BLACK = "black";
+const CUBE_ID_BLACK = "toio Core Cube-D1h";
+
+const CUBE_ID_BLUE = "toio Core Cube-H1A";
 const CUBE_NAME_BLUE = "blue";
 
 const connectedCubeArray = [];
 const knownCubesById = {};
 const cubeNameToId = {};
-cubeNameToId[CUBE_NAME_BLUE] = 0;
-cubeNameToId[CUBE_NAME_YELLOW] = 1;
+cubeNameToId[CUBE_NAME_RED] = 0;
+cubeNameToId[CUBE_NAME_BLACK] = 1;
+cubeNameToId[CUBE_NAME_BLUE] = 2;
 
 const MOTOR_MIN_SPEED = 8;
 const MOTOR_MAX_SPEED = 115;
