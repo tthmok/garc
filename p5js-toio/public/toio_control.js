@@ -46,6 +46,9 @@ socket.on('bot_command', function (msg) {
 function tryExecCommand(timestamp, cubeState, username, commandFn, duration) {
   console.log(cubeState);
   console.log(username);
+  if (duration > MAX_TIME) {
+    duration = MAX_TIME;
+  }
   if (timestamp > cubeState.prevActionDone) {
     console.log("Do command");
     //cubeState.prevActionDone = timestamp + duration;
@@ -100,6 +103,9 @@ async function asyncHandleCubeCommand(msg) {
               var turnSpeed = MOTOR_TURN_SPEED;
               if (degrees < 0) {
                 turnSpeed = -turnSpeed;
+              }
+              if (duration == 0) {
+                duration = 1; // this is a hacky fix to try and prevent eternal duration
               }
               cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(turnSpeed, -turnSpeed, duration), duration);
             } else if (command === 'spin') {
