@@ -68,6 +68,27 @@ function tryExecCommand(timestamp, cubeState, username, commandFn, duration) {
 const DEFAULT_TIME = 1350;
 const MAX_TIME = 2550;
 
+function drawPolygon(c, cState, userName, startTs, sideSpeed, numSides, sideCount) {
+  if (sideCount < numSides * 2) {
+    let angle = (numSides - 2) * 180 / numSides;
+    if (sideCount % 2 === 0) {
+      // Go straight
+      cState.prevActionDone = tryExecCommand(c, startTs, cState, userName, () => c.move(sideSpeed, sideSpeed, 1350), 1350);
+      setTimeout(() => drawPolygon(c, cState, userName, startTs + 1400, sideSpeed, sideCount + 1), 1400);
+    }
+    else {
+      var durationTurnExtraTime = 50;
+      var duration = turnDurationForDegrees(angle - 180);
+      var turnSpeed = MOTOR_TURN_SPEED;
+      if (angle - 180 < 0) {
+        turnSpeed = -turnSpeed;
+      }
+      cState.prevActionDone = tryExecCommand(c, startTs, cState, userName, () => c.rotate(turnSpeed, duration), duration);
+      setTimeout(() => drawPolygon(c, cState, userName, startTs + duration + durationTurnExtraTime, sideSpeed, sideCount + 1), duration + durationTurnExtraTime);
+    }
+  }
+}
+
 async function asyncHandleCubeCommand(msg) {
   if (msg != null) {
     const args = msg.slice(1).split(' ');
@@ -115,6 +136,8 @@ async function asyncHandleCubeCommand(msg) {
               console.log("spinning");
               var speed = parseSpeed(args.shift(), 8);
               cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(-speed, speed, DEFAULT_TIME), DEFAULT_TIME);
+            } else if (command === 'poly') {
+              drawPolygon(cube, cubeState, "testUserName", ts, 15, 3, 0);
             } else {
               console.log(`* Unknown command ${command}`);
             }
