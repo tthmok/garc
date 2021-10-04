@@ -152,14 +152,24 @@ async function asyncHandleCubeCommand(msg) {
                 cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, DEFAULT_TIME), DEFAULT_TIME);             
             } else if (command === 'dist') {
               var distance = args.shift(); // assume in centimeters
-              // figure out some maximum
-              if (distance > MAX_DISTANCE) {
-                distance = MAX_DISTANCE;
+              if (distance != 0) {
+                // figure out some maximum
+                if (distance > MAX_DISTANCE) {
+                  distance = MAX_DISTANCE;
+                }
+                if (distance < -MAX_DISTANCE) {
+                  distance = -MAX_DISTANCE;
+                }
+                var duration = (Math.abs(distance) / CM_PER_SECOND) * 100;
+                duration = Math.round(duration);
+                console.log("dist: " + distance + " dur:" + duration);
+
+                var speed = MOTOR_BASIC_SPEED;
+                if (distance < 0) {
+                  speed = -speed;
+                }
+                cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, duration), duration);
               }
-              var duration = (distance / CM_PER_SECOND) * 100;
-              duration = Math.round(duration);
-              console.log("dist: " + distance + " dur:" + duration);
-              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(MOTOR_BASIC_SPEED, MOTOR_BASIC_SPEED, duration), duration);
             } else if (command === 'rotate') {
               // !{bot} rotate {degrees}
               var degrees = args.shift();
