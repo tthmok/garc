@@ -25,6 +25,7 @@ cubeNameToId[CUBE_NAME_BLACK] = 1;
 cubeNameToId[CUBE_NAME_BLUE] = 2;
 cubeNameToId[CUBE_NAME_GREEN] = 3;
 
+const MOTOR_BASIC_SPEED = 15;
 const MOTOR_MIN_SPEED = 8;
 const MOTOR_MAX_SPEED = 115;
 const MOTOR_TURN_SPEED = 13;
@@ -43,7 +44,7 @@ const MAX_INSTR_TIME = 255;
 const POLY_SIDE_TIME = 160;
 const MAX_DISTANCE = 10; //? not sure what a good max is
 
-const CM_PER_SECOND = 2.05; // at motor speed 8
+const CM_PER_SECOND = 4.25; // at motor speed 15
 //5.5cm at motor speed 8 for 1000 ms (send motor 100 as duration)
 
 // {prevActionDone: number}
@@ -158,7 +159,7 @@ async function asyncHandleCubeCommand(msg) {
               var duration = (distance / CM_PER_SECOND) * 100;
               duration = Math.round(duration);
               console.log("dist: " + distance + " dur:" + duration);
-              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(MOTOR_MIN_SPEED, MOTOR_MIN_SPEED, duration), duration);
+              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(MOTOR_BASIC_SPEED, MOTOR_BASIC_SPEED, duration), duration);
             } else if (command === 'rotate') {
               // !{bot} rotate {degrees}
               var degrees = args.shift();
