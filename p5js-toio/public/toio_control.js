@@ -122,82 +122,89 @@ function drawPolygon(c, cState, userName, startTs, sideSpeed, numSides, sideCoun
 async function asyncHandleCubeCommand(msg) {
   if (msg != null) {
     const args = msg.slice(1).split(' ');
+    console.log(args);
+    if (args.length == 4) {
+      console.log('args:' + args);
+      console.log('args length' + args.length);
 
-    console.log('args:' + args);
+      // Only execute commands when 
+      const ts = Date.now();
+      if (args != null) {
+        const cubeName = args.shift().toLowerCase();
+        console.log('cubeName:' + cubeName);
+        if (cubeName != null) {
+          console.log("Get cube by ID:" + cubeNameToId[cubeName]);
+          // Doing this because I don't have a unique ID that sticks around
+          // so just deal with it for now I guess
+          var cube = connectedCubeArray[cubeNameToId[cubeName]];
+          // var cube = knownCubesById[cubeNameToId[botName]];
+          let cubeState = cubeStates[cubeNameToId[cubeName]];
+          cubeState.cubeName = cubeName;
 
-    // Only execute commands when 
-    const ts = Date.now();
-    if (args != null) {
-      const cubeName = args.shift().toLowerCase();
-      console.log('cubeName:' + cubeName);
-      if (cubeName != null) {
-        console.log("Get cube by ID:" + cubeNameToId[cubeName]);
-        // Doing this because I don't have a unique ID that sticks around
-        // so just deal with it for now I guess
-        var cube = connectedCubeArray[cubeNameToId[cubeName]];
-        // var cube = knownCubesById[cubeNameToId[botName]];
-        let cubeState = cubeStates[cubeNameToId[cubeName]];
-        cubeState.cubeName = cubeName;
+          if (cube != null) {
+            const command = args.shift().toLowerCase();
+            console.log('command:' + command);
+            if (command != null) {
+              if (command === 'go' || command === 'back') {
+                  var speed = parseSpeed(args.shift(), 20);
+                  if (command === 'back') {
+                    speed = -speed;
+                  }
+                // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
+                  cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, DEFAULT_TIME), DEFAULT_TIME);             
+              } else if (command === 'dist') {
+                var distance = args.shift(); // assume in centimeters
+                if (distance != 0) {
+                  // figure out some maximum
+                  if (distance > MAX_DISTANCE) {
+                    distance = MAX_DISTANCE;
+                  }
+                  if (distance < -MAX_DISTANCE) {
+                    distance = -MAX_DISTANCE;
+                  }
+                  var duration = (Math.abs(distance) / CM_PER_SECOND) * 100;
+                  duration = Math.round(duration);
+                  console.log("dist: " + distance + " dur:" + duration);
 
-        if (cube != null) {
-          const command = args.shift().toLowerCase();
-          console.log('command:' + command);
-          if (command != null) {
-            if (command === 'go' || command === 'back') {
-                var speed = parseSpeed(args.shift(), 20);
-                if (command === 'back') {
-                  speed = -speed;
+                  var speed = MOTOR_BASIC_SPEED;
+                  if (distance < 0) {
+                    speed = -speed;
+                  }
+                  cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, duration), duration);
                 }
-              // duration	number	0	Motor control duration in msec. 0-2550( 0: Eternally ).
-                cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, DEFAULT_TIME), DEFAULT_TIME);             
-            } else if (command === 'dist') {
-              var distance = args.shift(); // assume in centimeters
-              if (distance != 0) {
-                // figure out some maximum
-                if (distance > MAX_DISTANCE) {
-                  distance = MAX_DISTANCE;
+              } else if (command === 'rotate') {
+                // !{bot} rotate {degrees}
+                var degreesStr = args.shift();
+                var degreeNum = parseInt(degreesStr);
+                
+                if (!isNaN(degreeNum)) {
+                  var duration = turnDurationForDegrees(degreeNum);
+                  var turnSpeed = MOTOR_TURN_SPEED;
+                  if (degreeNum < 0) {
+                    turnSpeed = -turnSpeed;
+                  }
+                  if (duration == 0) {
+                    duration = 1; // this is a hacky fix to try and prevent eternal duration
+                  }
+                  console.log("rotate: duration: " + duration);
+                  cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(turnSpeed, -turnSpeed, duration), duration);
                 }
-                if (distance < -MAX_DISTANCE) {
-                  distance = -MAX_DISTANCE;
+              } else if (command === 'spin') {
+                console.log("spinning");
+                var speed = parseSpeed(args.shift(), 8);
+                cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(-speed, speed, DEFAULT_TIME), DEFAULT_TIME);
+              } else if (command === 'poly') {
+                var numSides = args.shift();
+                if (numSides >= 3 && numSides <= 8) {
+                //function drawPolygon(c, cState, userName, startTs, sideSpeed, numSides, sideCount)
+                  drawPolygon(cube, cubeState, args[args.length - 1], ts, 8, numSides, 0);
                 }
-                var duration = (Math.abs(distance) / CM_PER_SECOND) * 100;
-                duration = Math.round(duration);
-                console.log("dist: " + distance + " dur:" + duration);
-
-                var speed = MOTOR_BASIC_SPEED;
-                if (distance < 0) {
-                  speed = -speed;
-                }
-                cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(speed, speed, duration), duration);
-              }
-            } else if (command === 'rotate') {
-              // !{bot} rotate {degrees}
-              var degrees = args.shift();
-              var duration = turnDurationForDegrees(degrees);
-              var turnSpeed = MOTOR_TURN_SPEED;
-              if (degrees < 0) {
-                turnSpeed = -turnSpeed;
-              }
-              if (duration == 0) {
-                duration = 1; // this is a hacky fix to try and prevent eternal duration
-              }
-              console.log("rotate: duration: " + duration);
-              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(turnSpeed, -turnSpeed, duration), duration);
-            } else if (command === 'spin') {
-              console.log("spinning");
-              var speed = parseSpeed(args.shift(), 8);
-              cubeState.prevActionDone = tryExecCommand(ts, cubeState, args[args.length - 1], () => cube.move(-speed, speed, DEFAULT_TIME), DEFAULT_TIME);
-            } else if (command === 'poly') {
-              var numSides = args.shift();
-              if (numSides >= 3 && numSides <= 8) {
-              //function drawPolygon(c, cState, userName, startTs, sideSpeed, numSides, sideCount)
-                drawPolygon(cube, cubeState, args[args.length - 1], ts, 8, numSides, 0);
+              } else {
+                console.log(`* Unknown command ${command}`);
               }
             } else {
-              console.log(`* Unknown command ${command}`);
+              console.log(`* Missing command`);
             }
-          } else {
-            console.log(`* Missing command`);
           }
         }
       }
